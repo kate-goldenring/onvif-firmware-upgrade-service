@@ -1,0 +1,22 @@
+ARG PLATFORM=amd64
+FROM ${PLATFORM}/debian:buster-slim
+
+# Avoid tzdata prompt 
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN echo "Creating container based on ${PLATFORM}/debian:buster-slim" && \
+    apt-get update && \
+    apt-get install -y python3-pip && \
+    apt-get clean
+
+# TODO install with apt instead of pip to increase speed
+# TODO: consider compiling proto file in container
+RUN pip3 install grpcio-tools
+
+WORKDIR /app
+COPY ./client.py .
+COPY ./onvif_firmware_update_pb2_grpc.py .
+COPY ./onvif_firmware_update_pb2.py .
+COPY ./onvif_firmware_update.proto .
+
+CMD python3 ./client.py
