@@ -1,0 +1,21 @@
+syntax = "proto3";
+package onvif_firmware_update;
+
+// The greeter service definition.
+service FirmwareUpdate {
+  // Sends a greeting
+  rpc UpdateFirmware (UpdateFirmwareRequest) returns (UpdateFirmwareReply) {}
+}
+
+// The request message containing the user's name.
+message UpdateFirmwareRequest {
+  string version = 1;
+  int32 reboot_time_secs = 2;
+
+}
+
+// TODO decide if empty reply
+// The response message containing the greetings
+message UpdateFirmwareReply {
+  string version = 1;
+}

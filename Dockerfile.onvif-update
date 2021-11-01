@@ -6,12 +6,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN echo "Creating container based on ${PLATFORM}/debian:buster-slim" && \
     apt-get update && \
-    apt-get install -y python3-pip && \
-    apt-get clean
-
-# TODO install with apt instead of pip to increase speed
-# TODO: consider compiling proto file in container
-RUN pip3 install grpcio-tools
+    apt-get install -y protobuf-compiler libprotoc-dev python3-pip python3-grpcio python3-kubernetes && \
+    apt-get clean && \
+    pip3 install protobuf
 
 WORKDIR /app
 COPY ./client.py .
