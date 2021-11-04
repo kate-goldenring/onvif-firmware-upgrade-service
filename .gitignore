@@ -1,0 +1,6 @@
+# ignore output from the mock ONVIF and ws-discovery services
+*.log
+# Ignore the PID files created upon running the mock ONVIF and ws-discovery services
+*.pid
+# Ignore the nohup file created by running the Python rtsp-feed.py program in the background
+nohup.out
