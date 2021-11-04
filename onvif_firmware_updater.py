@@ -7,32 +7,42 @@ import onvif_firmware_update_pb2
 import onvif_firmware_update_pb2_grpc
 import os, subprocess, time
 
-STOP_CAMERA_SCRIPT_PATH = "/home/kagold/firmware-poc/mock-onvif/stop-onvif-camera.sh"
-START_CAMERA_SCRIPT_PATH = "/home/kagold/firmware-poc/mock-onvif/debug-start-onvif-camera.sh"
+RESOURCES_DIRECTORY_ENV_VAR = "RESOURCES_DIRECTORY"
+DEFAULT_RESOURCES_DIRECTORY ="/tmp/mock-onvif"
+STOP_CAMERA_SCRIPT_NAME = "stop-onvif-camera.sh"
+START_CAMERA_SCRIPT_NAME = "start-onvif-camera.sh"
+NETWORK_INTERFACE_ENV_VAR = "NETWORK_INTERFACE"
 
 # FirmwareUpdater provides an implementation of the methods of the RouteGuide service.
 class FirmwareUpdateServicer(onvif_firmware_update_pb2_grpc.FirmwareUpdateServicer):
 
     def UpdateFirmware(self, request, context):
         print("UpdateFirmware - called")
+        directory = os.getenv(RESOURCES_DIRECTORY_ENV_VAR, default = DEFAULT_RESOURCES_DIRECTORY)
+        if not os.path.exists(directory):
+            raise ValueError("Directory {} does not exist".format(directory))
+        print("Using resources in directory {}".format(directory))
         requested_version = request.version
         timeout = request.reboot_time_secs
         print("UpdateFirmware - called with version {} and timeout {}".format(requested_version, timeout))
-        if os.path.exists(START_CAMERA_SCRIPT_PATH):
-            t1 = threading.Thread(target=update, args=(requested_version, int(timeout),))
-            t1.start()
-        else: 
-            print("ERROR script file DNE")
-            # TODO: pull file
+        start_camera_script_path = os.path.join(directory, START_CAMERA_SCRIPT_NAME)
+        stop_camera_script_path = os.path.join(directory, STOP_CAMERA_SCRIPT_NAME)
+        t1 = threading.Thread(target=update, args=(requested_version, int(timeout),directory))
+        t1.start()
         return onvif_firmware_update_pb2.UpdateFirmwareReply(version = requested_version)
 
-def update(version, timeout):
-    os.system("sudo {}".format(STOP_CAMERA_SCRIPT_PATH))
+def update(version, timeout, script_directory):
+    start_camera_script_path = os.path.join(script_directory, START_CAMERA_SCRIPT_NAME)
+    stop_camera_script_path = os.path.join(script_directory, STOP_CAMERA_SCRIPT_NAME)
+    if not (os.path.exists(start_camera_script_path) and os.path.exists(stop_camera_script_path)):
+        print("ERROR script files DNE")
+        raise ValueError("ERROR script files DNE at {} and {}".format(start_camera_script_path, stop_camera_script_path))
+    interface = os.environ[NETWORK_INTERFACE_ENV_VAR]
+    print("Requested interface is {}".format(interface))
+    os.system("sudo {}".format(stop_camera_script_path))
     print("Sleeping for {} seconds requested before restarting camera".format(timeout))
     time.sleep(timeout)
-    # Needs to be sudo
-    # rc = subprocess.check_call([START_CAMERA_SCRIPT_PATH, "eno1"])
-    os.system("sudo {} {} {}".format(START_CAMERA_SCRIPT_PATH, "eno1", version))
+    os.system("sudo {} {} {}".format(start_camera_script_path, interface, version))
 
 
 def serve():
