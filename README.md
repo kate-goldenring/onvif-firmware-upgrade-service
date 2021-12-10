@@ -50,15 +50,14 @@ pip3 install grpcio-tools
 ```
 From the root of the project, generate the protobuf code:
 ```
-python -m grpc_tools.protoc -I./ --python_out=. --grpc_python_out=. ./onvif_firmware_update.proto
+python -m grpc_tools.protoc -I./proto --python_out=./proto --grpc_python_out=./proto ./proto/onvif_firmware_update.proto
 ```
 
 ## Running the client
 The client takes in three environment variables:
-`JOB_DESIRED_STATE`: defines the firmware version it should request (ie `2.0`)
-`AKRI_JOB_STATE_FILE_PATH`: defines the directory at which it should write the version it successfully initiated an upgrade to (ie `/var/lib/akri/management/test`)
+`DESIRED_FIRMWARE_VERSION`: defines the firmware version it should request (ie `2.0`)
 `ONVIF_DEVICE_IP_ADDRESS`: defines the IP address at which the camera update service lives (defaults to `localhost`)
-Full command: `JOB_DESIRED_STATE=2.0 AKRI_JOB_STATE_FILE_PATH=/var/lib/akri/management/test $PWD/.virtualenvs/venv/bin/python $PWD/client.py`
+Full command: `DESIRED_FIRMWARE_VERSION=2.0 $PWD/.virtualenvs/venv/bin/python $PWD/client.py`
 
 ## Running the server
 Ensure the mock onvif server binary is at `$RESOURCES_DIRECTORY/onvif_srvd/onvif_srvd`
