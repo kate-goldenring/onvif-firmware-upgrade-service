@@ -25,8 +25,6 @@ class FirmwareUpdateServicer(onvif_firmware_update_pb2_grpc.FirmwareUpdateServic
         requested_version = request.version
         timeout = request.reboot_time_secs
         print("UpdateFirmware - called with version {} and timeout {}".format(requested_version, timeout))
-        start_camera_script_path = os.path.join(directory, START_CAMERA_SCRIPT_NAME)
-        stop_camera_script_path = os.path.join(directory, STOP_CAMERA_SCRIPT_NAME)
         t1 = threading.Thread(target=update, args=(requested_version, int(timeout),directory))
         t1.start()
         return onvif_firmware_update_pb2.UpdateFirmwareReply(version = requested_version)
