@@ -4,3 +4,5 @@
 *.pid
 # Ignore the nohup file created by running the Python rtsp-feed.py program in the background
 nohup.out
+# Ignore the generated protobuf code
+*pb2*
