@@ -70,6 +70,6 @@ The server takes in two environment variable:
 `RESOURCES_DIRECTORY`: directory of both scripts and `onvif_srvd`, `wsdd`, and `rtsp_feed.py` binaries. Defaults to `/tmp/mock-onvif`.
 Navigate to the directory of this README and run:
 - if using a virtual environment at `$HOME/.virtualenvs`: `sudo NETWORK_INTERFACE=eth0 $HOME/.virtualenvs/venv/bin/python $PWD/onvif_firmware_updater.py`
-- if using a standard Python environment: `sudo NETWORK_INTERFACE=eth0 onvif_firmware_updater.py`
+- if using a standard Python environment: `sudo NETWORK_INTERFACE=eth0 python onvif_firmware_updater.py`
 
 > Note: `RECV.log`, `SENT.log`, `TEST.log`, and `wsdd.pid` files will be created in the root of the director each time the server is run. This is output from the `onvif_srvd` program.

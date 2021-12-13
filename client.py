@@ -1,7 +1,7 @@
 import logging
 import grpc
-import onvif_firmware_update_pb2
-import onvif_firmware_update_pb2_grpc
+import proto.onvif_firmware_update_pb2 as onvif_firmware_update_pb2
+import proto.onvif_firmware_update_pb2_grpc as onvif_firmware_update_pb2_grpc
 import os
 
 CAMERA_IP_ENV_VAR = "ONVIF_DEVICE_IP_ADDRESS"

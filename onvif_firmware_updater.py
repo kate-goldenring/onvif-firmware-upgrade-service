@@ -3,9 +3,8 @@ import logging
 import grpc
 import threading
 import time
-import onvif_firmware_update_pb2
-import onvif_firmware_update_pb2_grpc
-import os, subprocess, time
+import proto.onvif_firmware_update_pb2 as onvif_firmware_update_pb2, proto.onvif_firmware_update_pb2_grpc as onvif_firmware_update_pb2_grpc
+import os, time
 
 RESOURCES_DIRECTORY_ENV_VAR = "RESOURCES_DIRECTORY"
 DEFAULT_RESOURCES_DIRECTORY ="/tmp/mock-onvif"
