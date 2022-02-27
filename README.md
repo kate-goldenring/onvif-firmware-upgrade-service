@@ -3,13 +3,13 @@ A gRPC interface definition for upgrading a mock ONVIF camera. Assumes the use o
 Includes:
 1. A service that terminates any cameras with a [stop script](https://github.com/kate-goldenring/onvif-camera-mocking/blob/main/scripts/stop-onvif-camera.sh), pauses for given timeout (to simulate reboot), and runs the [start script](https://github.com/kate-goldenring/onvif-camera-mocking#start-the-onvif-and-discovery-services) for the mock camera, passing in the requested firmware version. 
 1. A client that can be used for testing the service.
-1. A dockerfile for building the client
+1. A Dockerfile for building the client
 
 ## Prerequisites
 ### Mock camera services
-Choose where to store th necessary resources for mocking an ONVIF camera. It should be in a global directory such as within the `/tmp` folder.
+Choose where to store th necessary resources for mocking an ONVIF camera. If using the [this onvif-camera-mocking library](https://github.com/kate-goldenring/onvif-camera-mocking), it may be best to point to the base of that respository (i.e. `/path/to/onvif-camera-mocking`).
 ```sh
-export RESOURCES_DIRECTORY = "/tmp/mock-onvif".
+export RESOURCES_DIRECTORY = "/path/to/onvif-camera-mocking".
 ```
 
 1. Follow these [steps](https://github.com/kate-goldenring/onvif-camera-mocking#get-the-onvif-server-and-ws-discovery-service) to get the `onvif_srvd` and `wsdd` services. Move the `onvif_srvd` and `wsdd` folders to the `$RESOURCES_DIRECTORY` directory.
@@ -54,22 +54,31 @@ python -m grpc_tools.protoc -I./proto --python_out=./proto --grpc_python_out=./p
 ```
 
 ## Running the client
-The client takes in three environment variables:
-`DESIRED_FIRMWARE_VERSION`: defines the firmware version it should request (ie `2.0`)
-`ONVIF_DEVICE_IP_ADDRESS`: defines the IP address at which the camera update service lives (defaults to `localhost`)
-Full command: `DESIRED_FIRMWARE_VERSION=2.0 $PWD/.virtualenvs/venv/bin/python $PWD/client.py`
+**Run `python $PWD/client.py -h` for instructions on script use.**
+The client takes in the following arguments:
+| Arg | Description |
+| --- | ----------- |
+| `--firmware-version` | Defines the firmware version the client should request the camera be upgraded to (ie `2.0`). Default: 2.0. |
+| `--device-ip-address` |  [Required] Defines the IP address at which the camera update service lives. |
 
 ## Running the server
+**Run `python onvif_firmware_updater.py -h` for instructions on script use.**
+
 Ensure the mock onvif server binary is at `$RESOURCES_DIRECTORY/onvif_srvd/onvif_srvd`
 Ensure the mock onvif wsdd Discovery is at `$RESOURCES_DIRECTORY/wsdd/wsdd`
 Ensure the rtsp feed program is at `$RESOURCES_DIRECTORY/rtsp_feed.py`
 Ensure the start script is at `$RESOURCES_DIRECTORY/start-onvif-camera.sh`
 Ensure the stop script is at `$RESOURCES_DIRECTORY/stop-onvif-camera.sh`
-The server takes in two environment variable:
-`NETWORK_INTERFACE`: defines the network interface of the machine that is running this program. It is the interface the camera will be served on. Run `ifconfig` or `ipconfig` to determine your network interface. Then, pass your interface (such as `eno1`, `eth0`, `eth1`, etc) to the script. The following assumes `eth0`.
-`RESOURCES_DIRECTORY`: directory of both scripts and `onvif_srvd`, `wsdd`, and `rtsp_feed.py` binaries. Defaults to `/tmp/mock-onvif`.
-Navigate to the directory of this README and run:
-- if using a virtual environment at `$HOME/.virtualenvs`: `sudo NETWORK_INTERFACE=eth0 $HOME/.virtualenvs/venv/bin/python $PWD/onvif_firmware_updater.py`
-- if using a standard Python environment: `sudo NETWORK_INTERFACE=eth0 python onvif_firmware_updater.py`
 
-> Note: `RECV.log`, `SENT.log`, `TEST.log`, and `wsdd.pid` files will be created in the root of the director each time the server is run. This is output from the `onvif_srvd` program.
+The server takes in the following arguments:
+| Arg | Description |
+| --- | ----------- |
+| `--network-interface` | defines the network interface of the machine that is running this program. It is the interface the camera will be served on. Run `ifconfig` or `ipconfig` to determine your network interface. Then, pass your interface (such as `eno1`, `eth0`, `eth1`, etc) to the script. The following assumes `eth0`. |
+| `--resources-directory` |  directory of both scripts and `onvif_srvd`, `wsdd`, and `rtsp_feed.py` binaries. Defaults to `~/onvif-camera-mocking`. |
+| `--start-camera` | Specifies whether the mock camera should be served (in the case it is not already running) |
+
+Navigate to the base of this repository and run:
+- if using a virtual environment at `$HOME/.virtualenvs`: `sudo $HOME/.virtualenvs/venv/bin/python $PWD/onvif_firmware_updater.py --network-interface eth0 --resources-directory $RESOURCES_DIRECTORY --start-camera`
+- if using a standard Python environment: `sudo python onvif_firmware_updater.py --network-interface eth0 --resources-directory $RESOURCES_DIRECTORY --start-camera`
+
+> Note: `RECV.log`, `SENT.log`, `TEST.log`, and `wsdd.pid` files will be created in the base of the resources directory each time the server is run. This is output from the `onvif_srvd` program.
