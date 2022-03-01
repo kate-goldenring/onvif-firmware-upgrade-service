@@ -53,6 +53,12 @@ From the root of the project, generate the protobuf code:
 python -m grpc_tools.protoc -I./proto --python_out=./proto --grpc_python_out=./proto ./proto/onvif_firmware_update.proto
 ```
 
+> Note: you may need to add the modules in the `proto` directory to your `PYTHONPATH`:
+
+```sh
+export PYTHONPATH+=proto
+```
+
 ## Running the client
 **Run `python $PWD/client.py -h` for instructions on script use.**
 The client takes in the following arguments:
